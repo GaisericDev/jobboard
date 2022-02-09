@@ -1,10 +1,11 @@
 <template>
   <div class="job-list">
     <p>Ordered by {{ order }}</p>
-    <ul>
-      <li v-for="job in jobs" :key="job.id">
+    <transition-group name="list" tag="ul">
+      <li v-for="job in orderedJobs" :key="job.id">
         <h2>{{ job.title }} in {{ job.location }}</h2>
         <div class="salary">
+          <img src="../assets/rupee.svg" alt="rupee icon" />
           <p>{{ job.salary }} rupees</p>
         </div>
         <div class="description">
@@ -14,11 +15,11 @@
           consequuntur amet non facere.
         </div>
       </li>
-    </ul>
+    </transition-group>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import Job from "@/types/Job";
 import OrderTerm from "@/types/OrderTerm";
 
@@ -32,6 +33,14 @@ export default defineComponent({
       required: true,
       type: String as PropType<OrderTerm>,
     },
+  },
+  setup(props) {
+    const orderedJobs = computed(() => {
+      return [...props.jobs].sort((a: Job, b: Job) => {
+        return a[props.order] > b[props.order] ? 1 : -1;
+      });
+    });
+    return { orderedJobs };
   },
 });
 </script>
@@ -65,5 +74,8 @@ export default defineComponent({
   color: #17bf66;
   font-weight: bold;
   margin: 10px 4px;
+}
+.list-move {
+  transition: all 1s;
 }
 </style>
